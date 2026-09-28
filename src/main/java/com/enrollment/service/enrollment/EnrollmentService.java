@@ -1,6 +1,8 @@
 package com.enrollment.service.enrollment;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +29,9 @@ public class EnrollmentService {
 				request.lastName(),
 				request.dateOfBirth(),
 				EnrollmentStatus.PENDING,
-				Instant.now());
+				// CQL timestamp stores milliseconds only. Truncating here makes the create response
+				// match what a later read returns.
+				Instant.now().truncatedTo(ChronoUnit.MILLIS));
 		return repository.save(enrollment);
 	}
 
@@ -40,5 +44,9 @@ public class EnrollmentService {
 	public Enrollment findById(UUID id) {
 		return repository.findById(id)
 				.orElseThrow(() -> new EnrollmentNotFoundException(id));
+	}
+
+	public List<Enrollment> findByCustomerId(String customerId) {
+		return repository.findByCustomerId(customerId);
 	}
 }

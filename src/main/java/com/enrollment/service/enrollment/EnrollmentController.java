@@ -1,5 +1,6 @@
 package com.enrollment.service.enrollment;
 
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -40,5 +42,13 @@ public class EnrollmentController {
 	@GetMapping("/{id}")
 	public EnrollmentResponse get(@PathVariable UUID id) {
 		return EnrollmentResponse.from(service.findById(id));
+	}
+
+	/** {@code GET /enrollments?customerId=C-1001}: served by the enrollments_by_customer table. */
+	@GetMapping(params = "customerId")
+	public List<EnrollmentResponse> listByCustomer(@RequestParam String customerId) {
+		return service.findByCustomerId(customerId).stream()
+				.map(EnrollmentResponse::from)
+				.toList();
 	}
 }

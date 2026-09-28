@@ -1,0 +1,32 @@
+# Local dependencies. Start with:  docker compose up -d
+services:
+  cassandra:
+    image: cassandra:5.0
+    ports:
+      - "9042:9042"            # CQL native protocol (what the Java driver and cqlsh use)
+    environment:
+      MAX_HEAP_SIZE: 512M      # Cassandra sizes its heap from host RAM by default; keep it small for a laptop
+      HEAP_NEWSIZE: 128M
+    volumes:
+      - cassandra-data:/var/lib/cassandra   # named volume: data survives `docker compose down` (not `down -v`)
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
+
+  # One-shot job: waits for Cassandra to be healthy, applies the schema, then exits.
+  # The schema uses IF NOT EXISTS, so it's safe to run again.
+  cassandra-init:
+    image: cassandra:5.0
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./src/main/resources/cassandra/schema.cql:/schema.cql:ro
+    entrypoint: ["cqlsh", "cassandra", "-f", "/schema.cql"]
+    restart: "no"
+
+volumes:
+  cassandra-data:

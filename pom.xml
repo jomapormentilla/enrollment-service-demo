@@ -56,8 +56,17 @@
 		</dependency>
 
 		<!--
+			Spring Data Cassandra + the DataStax Java driver. Boot auto-configures a CqlSession
+			and CassandraTemplate from the spring.cassandra.* properties.
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-cassandra</artifactId>
+		</dependency>
+
+		<!--
 			Retry: no dependency needed. Spring Framework 7 (under Boot 4) has @Retryable built in
-			(org.springframework.resilience.annotation). We switch it on in Phase 2 for the Cassandra write.
+			(org.springframework.resilience.annotation), switched on by @EnableResilientMethods.
 		-->
 
 		<dependency>
@@ -68,6 +77,23 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Testcontainers: tests start a throwaway Cassandra in Docker instead of needing one running -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers-cassandra</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
